@@ -1,4 +1,8 @@
 #include<gtk/gtk.h>
+#include<stdio.h>
+#include<stdbool.h>
+#include<stdlib.h>
+
 //Declare items
 GtkWidget *window;
 GtkWidget *buttons[3][3];
@@ -42,15 +46,76 @@ void quit()
 {
 	gtk_main_quit();
 }
-
-//mark buttons if clicked
-void mark(GtkWidget *button)
+void computer_mark()
 {
-	char *text=gtk_button_get_label(button);
-	if(text==NULL)
+	int i,j;
+	while(1)
 	{
-		gtk_button_set_label(button,"X");
+		i=random()%3;
+		j=random()%3;
+		if(gtk_button_get_label(GTK_BUTTON(buttons[i][j]))==NULL)
+		{
+			gtk_button_set_label(GTK_BUTTON(buttons[i][j]),"0");
+			break;
+		}
+	}	
+}
+	
+//check whether board finished.
+bool done()
+{
+	int count=0,i,j;
+	for(i=0;i<3;i++)
+		for(j=0;j<3;j++)
+		{
+			if(gtk_button_get_label(GTK_BUTTON(buttons[i][j]))!=NULL)
+				count++;
+		}
+	printf("%d ",count);
+	if(count==9)
+		return true;
+	else
+		return false;
+}
+
+//reset all buttons
+void reset()
+{
+	int i,j;
+	for(i=0;i<3;i++)
+		for(j=0;j<3;j++)
+		{
+			gtk_button_set_label(GTK_BUTTON(buttons[i][j]),"");
+			gtk_button_set_label(GTK_BUTTON(buttons[i][j]),NULL);
+			//gtk_widget_show(buttons[i][j]);
+		}
+}
+//mark buttons if clicked
+int mark(GtkWidget *button)
+{
+	if(gtk_button_get_label(GTK_BUTTON(button))==NULL)
+	{
+		gtk_button_set_label(GTK_BUTTON(button),"X");
 	}
+	else
+	{
+		return 0;
+	}
+	if(done())
+	{
+		printf("That was tie\n");
+		reset();
+		return 1;
+	}
+	else
+		computer_mark();
+	if(done())
+	{
+		printf("That was tie\n");
+		reset();
+		return 1;
+	}
+	return 0;
 }
 //connect signals
 void gtk_init_signals()
